@@ -1,5 +1,7 @@
 package org.litespring.beans;
 
+import java.util.List;
+
 /**
  * @autor sheltersodom
  * @create 2021-02-04-22:43
@@ -18,4 +20,6 @@ public interface BeanDefinition {
     void setScope(String scope);
 
     String getBeanClassName();
+
+    List<PropertyValue> getPropertyValues();
 }
