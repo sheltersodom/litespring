@@ -11,8 +11,8 @@ import java.io.InputStream;
  * @create 2021-02-05-17:31
  */
 public class ClassPathResource implements Resource {
-    private String path;
-    private ClassLoader classLoader;
+    private final String path;
+    private final ClassLoader classLoader;
 
     public ClassPathResource(String path, ClassLoader classLoader) {
         this.path = path;

@@ -1,5 +1,6 @@
 package org.litespring.beans.factory.support;
 
+import org.litespring.beans.PropertyValue;
 import org.litespring.beans.factory.config.RuntimeBeanReference;
 import org.litespring.beans.factory.config.TypedStringValue;
 
@@ -14,11 +15,12 @@ public class BeanDefinitionValueResolver {
         this.factory = factory;
     }
 
-    public Object resolveValueIfNecessary(Object value) {
+    public Object resolveValueIfNecessary(PropertyValue pv, Object value) {
         if (value instanceof RuntimeBeanReference) {
             RuntimeBeanReference ref = (RuntimeBeanReference) value;
             String beanName = ref.getBeanName();
             Object bean = factory.getBean(beanName);
+            if (pv != null) pv.setConvertedValue(bean);
             return bean;
         } else if (value instanceof TypedStringValue) {
             return ((TypedStringValue) value).getValue();
@@ -26,5 +28,9 @@ public class BeanDefinitionValueResolver {
             //TODO
             throw new RuntimeException("the value" + value + "has not implemented");
         }
+    }
+
+    public Object resolveValueIfNecessary(Object value) {
+        return resolveValueIfNecessary(null, value);
     }
 }

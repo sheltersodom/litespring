@@ -26,14 +26,15 @@ public class ResourceTest {
         }
     }
 
-//    @Test
-//    public void testFileSystemResource() {
-//        try {
-//            Resource r = new FileSystemResource("D:\\Code\\litespring\\src\\test\\resources\\petstore-v1");
-//            InputStream is = r.getInputStream();
-//            Assert.assertNotNull(is);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//    }
+    @Test
+    public void testFileSystemResource() {
+        try {
+            //使用相对路径,保证文件的可靠性
+            Resource r = new FileSystemResource("src\\test\\resources\\petstore-v1");
+            InputStream is = r.getInputStream();
+            Assert.assertNotNull(is);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }

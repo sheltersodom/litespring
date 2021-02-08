@@ -68,7 +68,7 @@ public class DefaultBeanFactory extends DefaultSingletonBeanRegistry implements 
             for (PropertyValue pv : pvs) {
                 String propertyName = pv.getName();
                 Object originalValue = pv.getValue();
-                Object resolvedValue = valueResolver.resolveValueIfNecessary(originalValue);
+                Object resolvedValue = valueResolver.resolveValueIfNecessary(pv, originalValue);
                 //使用set方法进行属性注入
                 BeanInfo beanInfo = Introspector.getBeanInfo(bean.getClass());
                 PropertyDescriptor[] pds = beanInfo.getPropertyDescriptors();
@@ -85,7 +85,7 @@ public class DefaultBeanFactory extends DefaultSingletonBeanRegistry implements 
         }
     }
 
-    private void populateBeanUseCommonUtils(BeanDefinition bd,Object bean){
+    private void populateBeanUseCommonUtils(BeanDefinition bd, Object bean) {
         List<PropertyValue> pvs = bd.getPropertyValues();
         if (pvs == null || pvs.isEmpty()) {
             return;
@@ -95,8 +95,8 @@ public class DefaultBeanFactory extends DefaultSingletonBeanRegistry implements 
             for (PropertyValue pv : pvs) {
                 String propertyName = pv.getName();
                 Object originalValue = pv.getValue();
-                Object resolvedValue = valueResolver.resolveValueIfNecessary(originalValue);
-                BeanUtils.setProperty(bean,propertyName,resolvedValue);
+                Object resolvedValue = valueResolver.resolveValueIfNecessary(pv, originalValue);
+                BeanUtils.setProperty(bean, propertyName, resolvedValue);
             }
         } catch (Exception e) {
             throw new BeanCreationException("Populate bean property failed for " + bd.getBeanClassName());

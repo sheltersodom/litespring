@@ -7,7 +7,7 @@ import java.util.Map;
  * @autor sheltersodom
  * @create 2021-02-05-11:19
  */
-public class ClassUtils {
+public abstract class ClassUtils {
     /**
      * Map with primitive wrapper type as key and corresponding primitive
      * type as value, for example: Integer.class -> int.class.

@@ -20,7 +20,7 @@ public class ApplicationContextTest {
     }
     @Test
     public void testGetBeanFromFileSystemContext() {
-        ApplicationContext ctx = new FileSystemXmlApplicationContext("D:\\Code\\litespring\\src\\test\\resources\\petstore-v1");
+        ApplicationContext ctx = new FileSystemXmlApplicationContext("src\\test\\resources\\petstore-v1");
         PetStoreService petStore = (PetStoreService) ctx.getBean("petStore");
         Assert.assertNotNull(petStore);
     }
