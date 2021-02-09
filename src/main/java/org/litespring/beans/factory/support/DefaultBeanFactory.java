@@ -52,7 +52,9 @@ public class DefaultBeanFactory extends DefaultSingletonBeanRegistry implements 
 
     private Object createBean(BeanDefinition bd) {
         //创建实例
-        Object bean = instantiateBean(bd);
+//        Object bean = instantiateBean(bd);
+        ConstructorResolver constructorResolver = new ConstructorResolver(this);
+        Object bean = constructorResolver.autowireConstructor(bd);
         populateBean(bd, bean);
         return bean;
     }
@@ -103,17 +105,17 @@ public class DefaultBeanFactory extends DefaultSingletonBeanRegistry implements 
         }
     }
 
-    private Object instantiateBean(BeanDefinition bd) {
-        ClassLoader c1 = this.getBeanClassLoader();
-        String beanClassName = bd.getBeanClassName();
-        try {
-            Class<?> clz = c1.loadClass(beanClassName);
-            //假定类中存在无参构造器
-            return clz.newInstance();
-        } catch (Exception e) {
-            throw new BeanCreationException("create bean for " + beanClassName + " failed", e);
-        }
-    }
+//    private Object instantiateBean(BeanDefinition bd) {
+//        ClassLoader c1 = this.getBeanClassLoader();
+//        String beanClassName = bd.getBeanClassName();
+//        try {
+//            Class<?> clz = c1.loadClass(beanClassName);
+//            //假定类中存在无参构造器
+//            return clz.newInstance();
+//        } catch (Exception e) {
+//            throw new BeanCreationException("create bean for " + beanClassName + " failed", e);
+//        }
+//    }
 
     @Override
     public void setBeanClassLoader(ClassLoader beanClassLoader) {

@@ -7,6 +7,7 @@ import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 import org.litespring.beans.BeanDefinition;
+import org.litespring.beans.ConstructorArgument;
 import org.litespring.beans.PropertyValue;
 import org.litespring.beans.factory.BeanDefinitionStoreException;
 import org.litespring.beans.factory.config.RuntimeBeanReference;
@@ -33,6 +34,10 @@ public class XmlBeanDefinitionReader {
     public static final String REF_ATTRIBUTE = "ref";
     public static final String VALUE_ATTRIBUTE = "value";
     public static final String NAME_ATTRIBUTE = "name";
+    public static final String CONSTRUCTOR_ARG_ELEMENT = "constructor-arg";
+    public static final String TYPE_ATTRIBUTE = "type";
+
+
     BeanDefinitionRegistry registry;
     protected final Log logger = LogFactory.getLog(getClass());
 
@@ -60,6 +65,7 @@ public class XmlBeanDefinitionReader {
                 if (ele.attribute(SCOPE_ATTRIBUTE) != null) {
                     bd.setScope(ele.attributeValue(SCOPE_ATTRIBUTE));
                 }
+                parseConstructorArgElements(ele, bd);
                 parsePropertyElement(ele, bd);
                 this.registry.registerBeanDefinition(id, bd);
             }
@@ -80,6 +86,29 @@ public class XmlBeanDefinitionReader {
         loadBeanDefinition(new ClassPathResource(config));
     }
 
+    private void parseConstructorArgElements(Element beanElem, BeanDefinition bd) {
+        Iterator iterator = beanElem.elementIterator(CONSTRUCTOR_ARG_ELEMENT);
+        while (iterator.hasNext()) {
+            Element ele = (Element) iterator.next();
+            parseConstructorArgElement(ele, bd);
+        }
+    }
+
+    private void parseConstructorArgElement(Element ele, BeanDefinition bd) {
+        String typeAttr = ele.attributeValue(TYPE_ATTRIBUTE);
+        String nameAttr = ele.attributeValue(NAME_ATTRIBUTE);
+        Object value = parsePropertyValue(ele, bd, null);
+        ConstructorArgument.ValueHolder valueHolder = new ConstructorArgument.ValueHolder(value);
+        if (StringUtils.hasLength(typeAttr)) {
+            valueHolder.setType(typeAttr);
+        }
+        if (StringUtils.hasLength(nameAttr)) {
+            valueHolder.setName(nameAttr);
+        }
+        bd.getConstructorArgument().addArgumentValues(valueHolder);
+    }
+
+
     private void parsePropertyElement(Element beanElem, BeanDefinition bd) {
         Iterator iterator = beanElem.elementIterator(PROPERTY_ELEMENT);
         while (iterator.hasNext()) {
@@ -99,8 +128,6 @@ public class XmlBeanDefinitionReader {
         String elementName = (propertyName != null) ?
                 "<property> element for property '" + propertyName + "'" :
                 "<constructor-arg> element";
-
-
         boolean hasRefAttribute = (ele.attribute(REF_ATTRIBUTE) != null);
         boolean hasValueAttribute = (ele.attribute(VALUE_ATTRIBUTE) != null);
 
