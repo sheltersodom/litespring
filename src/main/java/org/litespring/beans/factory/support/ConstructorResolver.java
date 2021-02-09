@@ -30,11 +30,7 @@ public class ConstructorResolver {
         Object[] argsToUse = null;
         Class<?> beanClass = null;
         try {
-            beanClass = bd.getBeanCache(bd.getBeanClassName());
-            if (beanClass == null) {
-                beanClass = this.beanFactory.getBeanClassLoader().loadClass(bd.getBeanClassName());
-                bd.SetBeanCache(beanClass);
-            }
+            beanClass = bd.resolve(beanFactory.getBeanClassLoader());
         } catch (ClassNotFoundException e) {
             throw new BeanCreationException(bd.getID(), "Instantiation of bean failed, can't resolve class");
         }

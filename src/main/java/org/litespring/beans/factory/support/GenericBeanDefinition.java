@@ -4,8 +4,10 @@ import org.litespring.beans.BeanDefinition;
 import org.litespring.beans.ConstructorArgument;
 import org.litespring.beans.PropertyValue;
 
+import java.lang.ref.SoftReference;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @autor sheltersodom
@@ -16,7 +18,7 @@ public class GenericBeanDefinition implements BeanDefinition {
     private String beanClassName;
     private boolean singleton = true;
     private boolean prototype = false;
-    private Class<?> beanCache;
+    private SoftReference<Class<?>> beanCache;
 
 
     public String getID() {
@@ -24,13 +26,14 @@ public class GenericBeanDefinition implements BeanDefinition {
     }
 
     @Override
-    public Class<?> getBeanCache(String beanClassName) {
-        return beanCache;
-    }
-
-    @Override
-    public void SetBeanCache(Class<?> beanCache) {
-        this.beanCache = beanCache;
+    public Class<?> resolve(ClassLoader classLoader) throws ClassNotFoundException {
+        Class<?> beanClass = null;
+        if (Objects.isNull(beanCache)) {
+            beanClass = classLoader.loadClass(beanClassName);
+            beanCache = new SoftReference<>(beanClass);
+        }
+        beanClass = beanCache.get();
+        return beanClass;
     }
 
     private String scope = SCOPE_DEFAULT;

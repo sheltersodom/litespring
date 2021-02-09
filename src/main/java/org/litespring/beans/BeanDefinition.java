@@ -1,5 +1,6 @@
 package org.litespring.beans;
 
+import java.lang.ref.SoftReference;
 import java.util.List;
 
 /**
@@ -27,7 +28,5 @@ public interface BeanDefinition {
 
     String getID();
 
-    Class<?> getBeanCache(String beanClassName);
-
-    void SetBeanCache(Class<?> beanClass);
+    Class<?> resolve(ClassLoader classLoader) throws ClassNotFoundException;
 }
