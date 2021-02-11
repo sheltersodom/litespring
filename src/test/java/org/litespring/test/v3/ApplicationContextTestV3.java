@@ -4,8 +4,8 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.litespring.context.ApplicationContext;
 import org.litespring.context.support.ClassPathXmlApplicationContext;
-import org.litespring.service.v3.AccountDao;
-import org.litespring.service.v3.ItemDao;
+import org.litespring.dao.v3.AccountDao;
+import org.litespring.dao.v3.ItemDao;
 import org.litespring.service.v3.PetStoreService;
 
 /**

@@ -19,10 +19,24 @@ public class GenericBeanDefinition implements BeanDefinition {
     private boolean singleton = true;
     private boolean prototype = false;
     private SoftReference<Class<?>> beanCache;
+    private String scope = SCOPE_DEFAULT;
+    private List<PropertyValue> propertyValues = new ArrayList<>();
+    private ConstructorArgument constructorArgument = new ConstructorArgument();
 
+    public GenericBeanDefinition() {
+    }
+
+    public GenericBeanDefinition(String id, String beanClassName) {
+        this.id = id;
+        this.beanClassName = beanClassName;
+    }
 
     public String getID() {
         return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     @Override
@@ -36,17 +50,12 @@ public class GenericBeanDefinition implements BeanDefinition {
         return beanClass;
     }
 
-    private String scope = SCOPE_DEFAULT;
-    private List<PropertyValue> propertyValues = new ArrayList<>();
-    private ConstructorArgument constructorArgument = new ConstructorArgument();
-
-    public GenericBeanDefinition(String id, String beanClassName) {
-        this.id = id;
-        this.beanClassName = beanClassName;
-    }
-
     public String getBeanClassName() {
         return this.beanClassName;
+    }
+
+    public void setBeanClassName(String beanClassName) {
+        this.beanClassName = beanClassName;
     }
 
     @Override
@@ -81,4 +90,6 @@ public class GenericBeanDefinition implements BeanDefinition {
     public ConstructorArgument getConstructorArgument() {
         return this.constructorArgument;
     }
+
+
 }

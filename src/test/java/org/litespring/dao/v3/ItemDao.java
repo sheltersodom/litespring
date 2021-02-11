@@ -1,4 +1,4 @@
-package org.litespring.service.v2;
+package org.litespring.dao.v3;
 
 /**
  * @autor sheltersodom
