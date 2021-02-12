@@ -37,13 +37,21 @@ public class AnnotationBeanNameGenerator implements BeanNameGenerator {
         String beanName = null;
         for (String type : types) {
             AnnotationAttributes attributes = amd.getAnnotationAttributes(type);
-            if (Component.class.getName().equals(type)) {
-                if (attributes.get("value") != null) {
-                    beanName = attributes.getString("value");
+            if (isStereotypeWithName(type, attributes)) {
+                Object value = attributes.get("value");
+                if (value instanceof String) {
+                    String strVal = (String) value;
+                    if (StringUtils.hasLength(strVal))
+                        beanName = strVal;
                 }
             }
         }
         return beanName;
+    }
+
+    protected boolean isStereotypeWithName(String annotationType, AnnotationAttributes attributes) {
+        boolean isStereotype = annotationType.equals(Component.class.getName());
+        return isStereotype && attributes != null && attributes.containsKey("value");
     }
 
     protected String bulidDefaultBeanName(BeanDefinition bd, BeanDefinitionRegistry registry) {
