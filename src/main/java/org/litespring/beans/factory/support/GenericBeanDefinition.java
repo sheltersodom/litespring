@@ -50,6 +50,24 @@ public class GenericBeanDefinition implements BeanDefinition {
         return beanClass;
     }
 
+    @Override
+    public Class<?> getBeanClass() {
+        if (this.beanCache == null) {
+            throw new IllegalStateException("Bean class name [" + this.getBeanClassName() + "] has not been resolved into an actual Class");
+        }
+        return this.beanCache.get();
+    }
+
+    @Override
+    public boolean hasBeanClass() {
+        return this.beanCache != null;
+    }
+
+    @Override
+    public Class<?> resolveBeanClass(ClassLoader classLoader) throws ClassNotFoundException {
+        return resolve(classLoader);
+    }
+
     public String getBeanClassName() {
         return this.beanClassName;
     }

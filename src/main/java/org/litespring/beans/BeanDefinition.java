@@ -1,6 +1,5 @@
 package org.litespring.beans;
 
-import java.lang.ref.SoftReference;
 import java.util.List;
 
 /**
@@ -29,4 +28,10 @@ public interface BeanDefinition {
     String getID();
 
     Class<?> resolve(ClassLoader classLoader) throws ClassNotFoundException;
+
+    Class<?> getBeanClass() throws IllegalStateException;
+
+    boolean hasBeanClass();
+
+    Class<?> resolveBeanClass(ClassLoader classLoader) throws ClassNotFoundException;
 }
