@@ -5,6 +5,7 @@ import org.litespring.beans.BeanDefinition;
 import org.litespring.beans.PropertyValue;
 import org.litespring.beans.SimpleTypeConverter;
 import org.litespring.beans.factory.BeanCreationException;
+import org.litespring.beans.factory.NoSuchBeanDefinitionException;
 import org.litespring.beans.factory.config.BeanPostProcessor;
 import org.litespring.beans.factory.config.ConfigurableBeanFactory;
 import org.litespring.beans.factory.config.DependencyDescriptor;
@@ -54,6 +55,7 @@ public class DefaultBeanFactory extends DefaultSingletonBeanRegistry implements 
         }
         return createBean(bd);
     }
+
 
     private Object createBean(BeanDefinition bd) {
         //创建实例
@@ -152,6 +154,7 @@ public class DefaultBeanFactory extends DefaultSingletonBeanRegistry implements 
         Class<?> typeToMatch = descriptor.getDependencyType();
         for (BeanDefinition bd : this.beanDefinitionMap.values()) {
             resolveBeanClass(bd);
+            //这里虽然多加载了,但是我们使用了软引用减少了oom的风险,虽然会对垃圾回收机制造成压力
             Class<?> beanClass = bd.getBeanClass();
             if (typeToMatch.isAssignableFrom(beanClass)) {
                 return this.getBean(bd.getID());
@@ -170,5 +173,15 @@ public class DefaultBeanFactory extends DefaultSingletonBeanRegistry implements 
                 throw new RuntimeException("can`t load class" + bd.getBeanClassName());
             }
         }
+    }
+
+    @Override
+    public Class<?> getType(String name) throws NoSuchBeanDefinitionException {
+        BeanDefinition bd = this.getBeanDefinition(name);
+        if (bd == null) {
+            throw new NoSuchBeanDefinitionException(name);
+        }
+        resolveBeanClass(bd);
+        return bd.getBeanClass();
     }
 }

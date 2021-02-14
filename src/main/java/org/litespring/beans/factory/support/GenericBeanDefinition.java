@@ -50,6 +50,10 @@ public class GenericBeanDefinition implements BeanDefinition {
         return beanClass;
     }
 
+    /**
+     * 约定作为resolve方法的后续执行者
+     * @return
+     */
     @Override
     public Class<?> getBeanClass() {
         if (this.beanCache == null) {

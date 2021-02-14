@@ -6,7 +6,6 @@ import org.litespring.beans.BeanDefinition;
 import org.litespring.beans.factory.BeanDefinitionStoreException;
 import org.litespring.beans.factory.support.BeanDefinitionRegistry;
 import org.litespring.beans.factory.support.BeanNameGenerator;
-import org.litespring.beans.factory.support.DefaultBeanFactory;
 import org.litespring.core.io.support.PackageResourceLoader;
 import org.litespring.core.type.classreading.MetadataReader;
 import org.litespring.core.type.classreading.SimpleMetadataReader;
