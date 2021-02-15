@@ -157,6 +157,10 @@ public class DefaultBeanFactory extends DefaultSingletonBeanRegistry implements 
             //这里虽然多加载了,但是我们使用了软引用减少了oom的风险,虽然会对垃圾回收机制造成压力
             Class<?> beanClass = bd.getBeanClass();
             if (typeToMatch.isAssignableFrom(beanClass)) {
+                //TODO 可能会存在多个实例符合条件(例如接口的实现类)
+                /*
+                多个无法抉择抛出异常,否则可以按,名称之类的优先级进行处理 再引入注解
+                 */
                 return this.getBean(bd.getID());
             }
         }
