@@ -15,10 +15,14 @@ public class ConstructorArgument {
     }
 
     public void addArgumentValues(Object value, String type) {
-        this.addArgumentValues(new ValueHolder(value, type));
+        this.addArgumentValue(new ValueHolder(value, type));
     }
 
-    public void addArgumentValues(ValueHolder valueHolder) {
+    public void addArgumentValue(Object value) {
+        this.argumentValues.add(new ValueHolder(value));
+    }
+
+    public void addArgumentValue(ValueHolder valueHolder) {
         this.argumentValues.add(valueHolder);
     }
 

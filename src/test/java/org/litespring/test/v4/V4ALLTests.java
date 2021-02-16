@@ -18,7 +18,7 @@ import org.litespring.test.v3.ConstructorResolverTest;
         InjectionMetadataTest.class,
         MetadataReaderTest.class,
         PackageResourceLoaderTest.class,
-        XmlBeanDefinitionReaderTest.class,})
+        XmlBeanDefinitionReaderTest.class})
 @RunWith(Suite.class)
 public class V4ALLTests {
 }

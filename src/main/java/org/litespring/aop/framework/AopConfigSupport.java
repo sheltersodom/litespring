@@ -75,4 +75,8 @@ public class AopConfigSupport implements AopConfig {
         }
         return result;
     }
+
+    public void addInterface(Class<?> targetInterface) {
+        interfaces.add(targetInterface);
+    }
 }

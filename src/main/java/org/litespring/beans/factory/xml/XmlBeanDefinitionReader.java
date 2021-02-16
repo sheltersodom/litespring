@@ -6,6 +6,7 @@ import org.apache.log4j.Logger;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
+import org.litespring.aop.config.ConfigBeanDefinitionParser;
 import org.litespring.beans.BeanDefinition;
 import org.litespring.beans.ConstructorArgument;
 import org.litespring.beans.PropertyValue;
@@ -40,6 +41,7 @@ public class XmlBeanDefinitionReader {
     public static final String BEANS_NAMESPACE_URI = "http://www.springframework.org/schema/beans";
     public static final String CONTEXT_NAMESPACE_URI = "http://www.springframework.org/schema/context";
     public static final String BASE_PACKAGE_ATTRBUTE = "base-package";
+    private static final String AOP_NAMESPACE_URI = "http://www.springframework.org/schema/aop";
 
 
     BeanDefinitionRegistry registry;
@@ -67,6 +69,8 @@ public class XmlBeanDefinitionReader {
                     parseDefalutElement(ele);//普通bean
                 } else if (this.isContextNameSpace(namespaceUri)) {
                     parseComponentElement(ele);//例如<context:component-scan>
+                } else if (this.isAOPNameSpace(namespaceUri)) {
+                    parseAOPElement(ele);
                 }
             }
         } catch (Exception e) {
@@ -81,6 +85,12 @@ public class XmlBeanDefinitionReader {
             }
         }
     }
+
+    private void parseAOPElement(Element ele) {
+        ConfigBeanDefinitionParser parser = new ConfigBeanDefinitionParser();
+        parser.parse(ele, this.registry);
+    }
+
 
     private void parseComponentElement(Element ele) {
         String basePackages = ele.attributeValue(BASE_PACKAGE_ATTRBUTE);
@@ -109,6 +119,10 @@ public class XmlBeanDefinitionReader {
         return (!StringUtils.hasLength(namespaceUri) || CONTEXT_NAMESPACE_URI.equals(namespaceUri));
     }
 
+    private boolean isAOPNameSpace(String namespaceUri) {
+        return (!StringUtils.hasLength(namespaceUri) || AOP_NAMESPACE_URI.equals(namespaceUri));
+    }
+
     public void loadBeanDefinition(String config) {
         loadBeanDefinition(new ClassPathResource(config));
     }
@@ -132,7 +146,7 @@ public class XmlBeanDefinitionReader {
         if (StringUtils.hasLength(nameAttr)) {
             valueHolder.setName(nameAttr);
         }
-        bd.getConstructorArgument().addArgumentValues(valueHolder);
+        bd.getConstructorArgument().addArgumentValue(valueHolder);
     }
 
 

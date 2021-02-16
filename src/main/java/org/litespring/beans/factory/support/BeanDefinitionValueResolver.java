@@ -1,7 +1,10 @@
 package org.litespring.beans.factory.support;
 
+import org.litespring.beans.BeanDefinition;
 import org.litespring.beans.PropertyValue;
+import org.litespring.beans.factory.BeanCreationException;
 import org.litespring.beans.factory.BeanFactory;
+import org.litespring.beans.factory.FactoryBean;
 import org.litespring.beans.factory.config.RuntimeBeanReference;
 import org.litespring.beans.factory.config.TypedStringValue;
 
@@ -10,9 +13,9 @@ import org.litespring.beans.factory.config.TypedStringValue;
  * @create 2021-02-06-23:42
  */
 public class BeanDefinitionValueResolver {
-    private final BeanFactory factory;
+    private final AbstractBeanFactory factory;
 
-    public BeanDefinitionValueResolver(BeanFactory factory) {
+    public BeanDefinitionValueResolver(AbstractBeanFactory factory) {
         this.factory = factory;
     }
 
@@ -25,9 +28,27 @@ public class BeanDefinitionValueResolver {
             return bean;
         } else if (value instanceof TypedStringValue) {
             return ((TypedStringValue) value).getValue();
+        } else if (value instanceof BeanDefinition) {
+            BeanDefinition bd = (BeanDefinition) value;
+            String innerBeanName = "(inner bean)" + bd.getBeanClassName() + "#" +
+                    Integer.toHexString(System.identityHashCode(bd));
+            return resolveInnerBean(innerBeanName, bd);
         } else {
             //TODO
-            throw new RuntimeException("the value" + value + "has not implemented");
+            return value;
+        }
+    }
+
+    private Object resolveInnerBean(String innerBeanName, BeanDefinition innerBd) {
+        Object innerBean = this.factory.createBean(innerBd);
+        if (innerBean instanceof FactoryBean) {
+            try {
+                return ((FactoryBean) innerBean).getObject();
+            } catch (Exception e) {
+                throw new BeanCreationException(innerBeanName, "FactoryBean threw exception on object creation", e);
+            }
+        } else {
+            return innerBean;
         }
     }
 

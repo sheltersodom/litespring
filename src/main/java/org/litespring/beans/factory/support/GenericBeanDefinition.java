@@ -1,5 +1,6 @@
 package org.litespring.beans.factory.support;
 
+import org.litespring.aop.config.MethodLocatingFactory;
 import org.litespring.beans.BeanDefinition;
 import org.litespring.beans.ConstructorArgument;
 import org.litespring.beans.PropertyValue;
@@ -22,6 +23,9 @@ public class GenericBeanDefinition implements BeanDefinition {
     private String scope = SCOPE_DEFAULT;
     private List<PropertyValue> propertyValues = new ArrayList<>();
     private ConstructorArgument constructorArgument = new ConstructorArgument();
+    //表明Bean是否是我们自己合成的
+    private boolean isSynthetic = false;
+
 
     public GenericBeanDefinition() {
     }
@@ -29,6 +33,11 @@ public class GenericBeanDefinition implements BeanDefinition {
     public GenericBeanDefinition(String id, String beanClassName) {
         this.id = id;
         this.beanClassName = beanClassName;
+    }
+
+    public GenericBeanDefinition(Class<?> clazz) {
+        this.beanCache = new SoftReference<>(clazz);
+        this.beanClassName = clazz.getName();
     }
 
     public String getID() {
@@ -52,6 +61,7 @@ public class GenericBeanDefinition implements BeanDefinition {
 
     /**
      * 约定作为resolve方法的后续执行者
+     *
      * @return
      */
     @Override
@@ -70,6 +80,15 @@ public class GenericBeanDefinition implements BeanDefinition {
     @Override
     public Class<?> resolveBeanClass(ClassLoader classLoader) throws ClassNotFoundException {
         return resolve(classLoader);
+    }
+
+    public void setSynthetic(boolean synthetic) {
+        isSynthetic = synthetic;
+    }
+
+    @Override
+    public boolean isSynthetic() {
+        return isSynthetic;
     }
 
     public String getBeanClassName() {

@@ -34,4 +34,6 @@ public interface BeanDefinition {
     boolean hasBeanClass();
 
     Class<?> resolveBeanClass(ClassLoader classLoader) throws ClassNotFoundException;
+
+    boolean isSynthetic();
 }
