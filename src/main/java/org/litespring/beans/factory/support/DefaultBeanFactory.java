@@ -1,6 +1,9 @@
 package org.litespring.beans.factory.support;
 
 import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.litespring.aop.framework.CglibProxyFactory;
 import org.litespring.beans.BeanDefinition;
 import org.litespring.beans.PropertyValue;
 import org.litespring.beans.SimpleTypeConverter;
@@ -28,6 +31,8 @@ import java.util.concurrent.ConcurrentHashMap;
 public class DefaultBeanFactory extends AbstractBeanFactory implements BeanDefinitionRegistry {
 
     private final Map<String, BeanDefinition> beanDefinitionMap = new ConcurrentHashMap<String, BeanDefinition>(64);
+    private static final Log logger = LogFactory.getLog(CglibProxyFactory.class);
+
     private List<BeanPostProcessor> beanPostProcessors = new ArrayList<>();
     private ClassLoader beanClassLoader;
 
@@ -60,9 +65,7 @@ public class DefaultBeanFactory extends AbstractBeanFactory implements BeanDefin
 
     protected Object createBean(BeanDefinition bd) {
         //创建实例
-//        Object bean = instantiateBean(bd);
-        ConstructorResolver constructorResolver = new ConstructorResolver(this);
-        Object bean = constructorResolver.autowireConstructor(bd);
+        Object bean = instantiateBean(bd);
         populateBean(bd, bean);
         bean = initializeBean(bd, bean);
         return bean;
@@ -119,6 +122,12 @@ public class DefaultBeanFactory extends AbstractBeanFactory implements BeanDefin
         }
     }
 
+    protected Object instantiateBean(BeanDefinition bd) {
+        ConstructorResolver constructorResolver = new ConstructorResolver(this);
+        Object bean = constructorResolver.autowireConstructor(bd);
+        return bean;
+    }
+
     protected Object initializeBean(BeanDefinition bd, Object bean) {
         invokeAwareMethods(bean);
         //TODO 对Bean进行初始化
@@ -145,17 +154,6 @@ public class DefaultBeanFactory extends AbstractBeanFactory implements BeanDefin
         }
     }
 
-//    private Object instantiateBean(BeanDefinition bd) {
-//        ClassLoader c1 = this.getBeanClassLoader();
-//        String beanClassName = bd.getBeanClassName();
-//        try {
-//            Class<?> clz = c1.loadClass(beanClassName);
-//            //假定类中存在无参构造器
-//            return clz.newInstance();
-//        } catch (Exception e) {
-//            throw new BeanCreationException("create bean for " + beanClassName + " failed", e);
-//        }
-//    }
 
     @Override
     public void setBeanClassLoader(ClassLoader beanClassLoader) {
@@ -230,7 +228,14 @@ public class DefaultBeanFactory extends AbstractBeanFactory implements BeanDefin
     private List<String> getBeanIDsByType(Class<?> type) {
         List<String> result = new ArrayList<>();
         for (String beanName : this.beanDefinitionMap.keySet()) {
-            if (type.isAssignableFrom(this.getType(beanName))) {
+            Class<?> beanClass = null;
+            try {
+                beanClass = this.getType(beanName);
+            } catch (Exception e) {
+                logger.warn("can`t load class for bean" + beanName + ", skip it");
+                continue;
+            }
+            if (beanClass != null && type.isAssignableFrom(beanClass)) {
                 result.add(beanName);
             }
         }

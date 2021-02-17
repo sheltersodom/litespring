@@ -1,8 +1,6 @@
 package org.litespring.aop.aspectj;
 
 import org.aopalliance.intercept.MethodInvocation;
-import org.litespring.aop.Advice;
-import org.litespring.aop.Pointcut;
 import org.litespring.aop.config.AspectInstanceFactory;
 
 import java.lang.reflect.Method;
