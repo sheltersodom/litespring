@@ -26,7 +26,6 @@ public class GenericBeanDefinition implements BeanDefinition {
     //表明Bean是否是我们自己合成的
     private boolean isSynthetic = false;
 
-
     public GenericBeanDefinition() {
     }
 

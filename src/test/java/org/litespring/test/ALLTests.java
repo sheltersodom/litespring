@@ -8,6 +8,7 @@ import org.litespring.test.v3.V3ALLTests;
 import org.litespring.test.v4.V4ALLTests;
 import org.litespring.test.v5.V5ALLTests;
 import org.litespring.test.v6.V6ALLTests;
+import org.litespring.test.v7.V7ALLTests;
 
 /**
  * @autor sheltersodom
@@ -19,6 +20,7 @@ import org.litespring.test.v6.V6ALLTests;
         V3ALLTests.class,
         V4ALLTests.class,
         V5ALLTests.class,
-        V6ALLTests.class})
+        V6ALLTests.class,
+        V7ALLTests.class})
 public class ALLTests {
 }

@@ -3,6 +3,7 @@ package org.litespring.beans.factory.support;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.litespring.aop.aspectj.AspectJAutoProxyCreator;
 import org.litespring.aop.framework.CglibProxyFactory;
 import org.litespring.beans.BeanDefinition;
 import org.litespring.beans.PropertyValue;
@@ -10,10 +11,7 @@ import org.litespring.beans.SimpleTypeConverter;
 import org.litespring.beans.factory.BeanCreationException;
 import org.litespring.beans.factory.BeanFactoryAware;
 import org.litespring.beans.factory.NoSuchBeanDefinitionException;
-import org.litespring.beans.factory.config.BeanPostProcessor;
-import org.litespring.beans.factory.config.ConfigurableBeanFactory;
-import org.litespring.beans.factory.config.DependencyDescriptor;
-import org.litespring.beans.factory.config.InstantiationAwareBeanPostProcessor;
+import org.litespring.beans.factory.config.*;
 import org.litespring.utils.ClassUtils;
 
 import java.beans.BeanInfo;
@@ -54,14 +52,42 @@ public class DefaultBeanFactory extends AbstractBeanFactory implements BeanDefin
         if (bd.isSingleton()) {
             Object bean = this.getSingleton(beanID);
             if (bean == null) {
-                bean = createBean(bd);
-                this.registerSingleton(beanID, bean);
+                bean = createBean(bd, beanID);
+                this.registerSingleton(beanID, bean, bd);
             }
             return bean;
         }
         return createBean(bd);
     }
 
+    protected Object createBean(BeanDefinition bd, String beanName) {
+        addSigletonCurrentlyInCreation(beanName);
+        Object bean = instantiateBean(bd);
+        Object expression = bean;
+        addSingleFactory(beanName, () -> getEarlyBeanReference(beanName, expression));
+        populateBean(bd, bean);
+        if (getEarlySingletonObjects().containsKey(beanName)) {
+            bean = getEarlySingletonObjects().get(beanName);
+        }
+        bean = initializeBean(bd, bean);
+        return bean;
+    }
+
+    private Object getEarlyBeanReference(String beanName, Object bean) {
+        Object result = bean;
+        for (BeanPostProcessor beanPostProcessor : getBeanPostProcessors()) {
+            if (beanPostProcessor instanceof SmartInstantiationAwareBeanPostProcessor) {
+                result = beanPostProcessor.afterInitialization(result, beanName);
+                if (result == null) {
+                    return result;
+                }
+            }
+        }
+        if(!bean.equals(result)){
+            getAopEarlyInCreation().add(beanName);
+        }
+        return result;
+    }
 
     protected Object createBean(BeanDefinition bd) {
         //创建实例
@@ -140,6 +166,11 @@ public class DefaultBeanFactory extends AbstractBeanFactory implements BeanDefin
     private Object applyBeanPostProcessorsAfterInitialization(Object existingBean, String beanName) {
         Object result = existingBean;
         for (BeanPostProcessor beanPostProcessor : getBeanPostProcessors()) {
+            if (beanPostProcessor instanceof SmartInstantiationAwareBeanPostProcessor) {
+                if (getAopEarlyInCreation().contains(beanName)) {
+                    continue;
+                }
+            }
             result = beanPostProcessor.afterInitialization(result, beanName);
             if (result == null) {
                 return result;

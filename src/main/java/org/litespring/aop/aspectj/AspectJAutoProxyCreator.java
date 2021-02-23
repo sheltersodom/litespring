@@ -8,8 +8,8 @@ import org.litespring.aop.framework.AopProxyFactory;
 import org.litespring.aop.framework.CglibProxyFactory;
 import org.litespring.aop.framework.JdkAopProxyFactory;
 import org.litespring.beans.BeansException;
-import org.litespring.beans.factory.config.BeanPostProcessor;
 import org.litespring.beans.factory.config.ConfigurableBeanFactory;
+import org.litespring.beans.factory.config.SmartInstantiationAwareBeanPostProcessor;
 import org.litespring.utils.ClassUtils;
 
 import java.lang.reflect.Method;
@@ -22,7 +22,7 @@ import java.util.Set;
  * @autor sheltersodom
  * @create 2021-02-16-23:49
  */
-public class AspectJAutoProxyCreator implements BeanPostProcessor {
+public class AspectJAutoProxyCreator implements SmartInstantiationAwareBeanPostProcessor {
     ConfigurableBeanFactory beanFactory;
 
     public void setBeanFactory(ConfigurableBeanFactory beanFactory) {
