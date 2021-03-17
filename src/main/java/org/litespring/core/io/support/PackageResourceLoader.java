@@ -60,7 +60,7 @@ public class PackageResourceLoader {
         URL url = c1.getResource(location);
         File rootDir = new File(url.getFile());
         String path = rootDir.getAbsolutePath();
-        String locationReplaced = location.replace('/', '\\');
+        String locationReplaced = location.replace('/', File.separatorChar);
         String parentPath = path.replace(locationReplaced, "");
 
         Resource[] resources = getResources(basePackage);
@@ -72,7 +72,7 @@ public class PackageResourceLoader {
             result[i++] = resource.getDescription().
                     replace(parentPath, "").
                     replace(".class", "")
-                    .replace('\\', '/');
+                    .replace(File.separatorChar, '/');
         }
         return result;
     }

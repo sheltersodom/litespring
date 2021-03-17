@@ -1,4 +1,5 @@
-package org.litespring.service.v9;
+package org.litespring.service.v10;
+
 
 import org.litespring.beans.factory.annotation.Autowired;
 import org.litespring.stereotype.Component;
@@ -6,19 +7,20 @@ import org.litespring.util.MessageTracker;
 
 /**
  * @autor sheltersodom
- * @create 2021-02-23-14:09
+ * @create 2021-02-08-22:34
  */
-@Component
-public class PetStoreA {
-    @Autowired
-    private PetStoreB petStoreB;
+@Component(value = "daoStore")
+public class DaoStoreService implements IDaoStoreService {
 
-    public PetStoreB getPetStoreB() {
-        return petStoreB;
+    @Autowired
+    private IPetStoreService petStoreService;
+
+    public DaoStoreService() {
     }
 
     public void placeOrder() {
         System.out.println("place order");
         MessageTracker.addMsg("place order");
     }
+
 }

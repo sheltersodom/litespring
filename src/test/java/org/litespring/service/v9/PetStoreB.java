@@ -11,10 +11,10 @@ import org.litespring.util.MessageTracker;
 @Component
 public class PetStoreB {
     @Autowired
-    PetStoreA petStoreA;
+    private PetStoreA petStoreA;
 
     public void placeOrder() {
-        System.out.println("place order");
+        System.out.println("place orderB");
         MessageTracker.addMsg("place order");
     }
 }
