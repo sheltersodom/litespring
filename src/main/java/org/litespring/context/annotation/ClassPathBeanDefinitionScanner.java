@@ -10,6 +10,9 @@ import org.litespring.core.io.support.PackageResourceLoader;
 import org.litespring.core.type.classreading.MetadataReader;
 import org.litespring.core.type.classreading.SimpleMetadataReader;
 import org.litespring.stereotype.Component;
+import org.litespring.stereotype.Controller;
+import org.litespring.stereotype.Repository;
+import org.litespring.stereotype.Service;
 import org.litespring.utils.StringUtils;
 
 import java.io.IOException;
@@ -50,7 +53,10 @@ public class ClassPathBeanDefinitionScanner {
             try {
                 MetadataReader metadataReader = new SimpleMetadataReader(resourcesPath);
 
-                if (metadataReader.getAnnotationMetadata().hasAnnotation(Component.class.getName())) {
+                if (metadataReader.getAnnotationMetadata().hasAnnotation(Component.class.getName())||
+                        metadataReader.getAnnotationMetadata().hasAnnotation(Controller.class.getName())||
+                        metadataReader.getAnnotationMetadata().hasAnnotation(Service.class.getName())||
+                        metadataReader.getAnnotationMetadata().hasAnnotation(Repository.class.getName())) {
                     ScannedGenericBeanDefinition sbd = new ScannedGenericBeanDefinition(metadataReader.getAnnotationMetadata());
                     String beanName = this.beanNameGenerator.generateBeanName(sbd, this.registry);
                     sbd.setId(beanName);

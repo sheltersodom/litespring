@@ -7,6 +7,9 @@ import org.litespring.beans.factory.support.BeanNameGenerator;
 import org.litespring.core.annotation.AnnotationAttributes;
 import org.litespring.core.type.AnnotationMetadata;
 import org.litespring.stereotype.Component;
+import org.litespring.stereotype.Controller;
+import org.litespring.stereotype.Repository;
+import org.litespring.stereotype.Service;
 import org.litespring.utils.ClassUtils;
 import org.litespring.utils.StringUtils;
 
@@ -50,7 +53,10 @@ public class AnnotationBeanNameGenerator implements BeanNameGenerator {
     }
 
     protected boolean isStereotypeWithName(String annotationType, AnnotationAttributes attributes) {
-        boolean isStereotype = annotationType.equals(Component.class.getName());
+        boolean isStereotype = annotationType.equals(Component.class.getName())
+                || annotationType.equals(Controller.class.getName())
+                || annotationType.equals(Service.class.getName())
+                || annotationType.equals(Repository.class.getName());
         return isStereotype && attributes != null && attributes.containsKey("value");
     }
 

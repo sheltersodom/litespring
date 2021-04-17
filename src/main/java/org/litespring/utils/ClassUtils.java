@@ -233,4 +233,19 @@ public abstract class ClassUtils {
         }
     }
 
+    public static Class<?> forName(String name, ClassLoader classLoader) throws ClassNotFoundException {
+        ClassLoader classLoaderToUse = classLoader;
+        if (classLoaderToUse == null) {
+            classLoaderToUse = getDefaultClassLoader();
+        }
+        return classLoaderToUse.loadClass(name);
+    }
+
+    public static <T> List<T> convertList(List<?> list, Class<T> clazz) {
+        List<T> result = new ArrayList<>();
+        for (Object o : list) {
+            result.add((T) o);
+        }
+        return result;
+    }
 }

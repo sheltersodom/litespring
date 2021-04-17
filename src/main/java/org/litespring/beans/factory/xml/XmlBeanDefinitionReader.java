@@ -19,6 +19,7 @@ import org.litespring.context.annotation.ClassPathBeanDefinitionScanner;
 import org.litespring.core.io.ClassPathResource;
 import org.litespring.core.io.Resource;
 import org.litespring.utils.StringUtils;
+import org.litespring.web.servlet.config.InterceptorsBeanDefinitionParser;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -42,6 +43,7 @@ public class XmlBeanDefinitionReader {
     public static final String CONTEXT_NAMESPACE_URI = "http://www.springframework.org/schema/context";
     public static final String BASE_PACKAGE_ATTRBUTE = "base-package";
     private static final String AOP_NAMESPACE_URI = "http://www.springframework.org/schema/aop";
+    private static final String MVC_NAMESPACE_URI = "http://www.springframework.org/schema/mvc";
 
 
     BeanDefinitionRegistry registry;
@@ -66,11 +68,13 @@ public class XmlBeanDefinitionReader {
                 Element ele = iterator.next();
                 String namespaceUri = ele.getNamespaceURI();
                 if (this.isDefaultNameSpace(namespaceUri)) {
-                    parseDefalutElement(ele);//普通bean
+                    parseDefalutElement(ele,true);//普通bean
                 } else if (this.isContextNameSpace(namespaceUri)) {
                     parseComponentElement(ele);//例如<context:component-scan>
                 } else if (this.isAOPNameSpace(namespaceUri)) {
                     parseAOPElement(ele);
+                } else if (this.isMVCNameSpace(namespaceUri)) {
+                    parseMVCElement(ele);
                 }
             }
         } catch (Exception e) {
@@ -86,6 +90,12 @@ public class XmlBeanDefinitionReader {
         }
     }
 
+    private void parseMVCElement(Element ele) {
+        InterceptorsBeanDefinitionParser parser = new InterceptorsBeanDefinitionParser();
+        parser.parse(ele, this, registry);
+    }
+
+
     private void parseAOPElement(Element ele) {
         ConfigBeanDefinitionParser parser = new ConfigBeanDefinitionParser();
         parser.parse(ele, this.registry);
@@ -98,7 +108,7 @@ public class XmlBeanDefinitionReader {
         scanner.doScan(basePackages);
     }
 
-    private void parseDefalutElement(Element ele) {
+    public BeanDefinition parseDefalutElement(Element ele,boolean isRegist) {
         String id = ele.attributeValue(ID_ATTRIBUTE);
         String beanClassName = ele.attributeValue(CLASS_ATTRIBUTE);
         //将封装好的beandefinition加入到map中
@@ -108,7 +118,11 @@ public class XmlBeanDefinitionReader {
         }
         parseConstructorArgElements(ele, bd);
         parsePropertyElement(ele, bd);
-        this.registry.registerBeanDefinition(id, bd);
+        if(isRegist){
+            this.registry.registerBeanDefinition(id, bd);
+        }
+
+        return bd;
     }
 
     public boolean isDefaultNameSpace(String namespaceUri) {
@@ -122,6 +136,11 @@ public class XmlBeanDefinitionReader {
     private boolean isAOPNameSpace(String namespaceUri) {
         return (!StringUtils.hasLength(namespaceUri) || AOP_NAMESPACE_URI.equals(namespaceUri));
     }
+
+    private boolean isMVCNameSpace(String namespaceUri) {
+        return (!StringUtils.hasLength(namespaceUri) || MVC_NAMESPACE_URI.equals(namespaceUri));
+    }
+
 
     public void loadBeanDefinition(String config) {
         loadBeanDefinition(new ClassPathResource(config));

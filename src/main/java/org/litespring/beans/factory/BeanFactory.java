@@ -15,4 +15,6 @@ public interface BeanFactory {
     Class<?> getType(String name) throws NoSuchBeanDefinitionException;
 
     List<Object> getBeansByType(Class<?> type);
+
+    List<String> getBeanIDsByType(Class<?> type);
 }

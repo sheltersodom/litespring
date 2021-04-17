@@ -2,7 +2,9 @@ package org.litespring.utils;
 
 import java.lang.reflect.*;
 import java.util.Arrays;
+import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 
@@ -14,14 +16,12 @@ public class ReflectionUtils {
     /**
      * Naming prefix for CGLIB-renamed methods.
      *
-     * @see #isCglibRenamedMethod
      */
     private static final String CGLIB_RENAMED_METHOD_PREFIX = "CGLIB$";
 
     /**
      * Pattern for detecting CGLIB-renamed methods.
      *
-     * @see #isCglibRenamedMethod
      */
     private static final Pattern CGLIB_RENAMED_METHOD_PATTERN = Pattern.compile("(.+)\\$\\d+");
 
@@ -166,6 +166,34 @@ public class ReflectionUtils {
                 !Modifier.isPublic(field.getDeclaringClass().getModifiers()) ||
                 Modifier.isFinal(field.getModifiers())) && !field.isAccessible()) {
             field.setAccessible(true);
+        }
+    }
+
+    public static void makeAccessible(Method method) {
+        if ((!Modifier.isPublic(method.getModifiers()) || !Modifier.isPublic(method.getDeclaringClass().getModifiers()))
+                && !method.isAccessible()) {
+            method.setAccessible(true);
+        }
+    }
+
+    public static Set<Method> getAllMethods(Class<?> handlerType) {
+        final Set<Method> handlerMethods = new LinkedHashSet<Method>();
+        Set<Class<?>> handlerTypes = new LinkedHashSet<Class<?>>();
+
+        handlerTypes.addAll(Arrays.asList(handlerType.getInterfaces()));
+        handlerTypes.add(handlerType);
+        for (Class<?> currentHandlerType : handlerTypes) {
+            Method[] declaredMethods = currentHandlerType.getDeclaredMethods();
+            handlerMethods.addAll(Arrays.asList(declaredMethods));
+        }
+        return handlerMethods;
+
+    }
+
+    public static void makeAccessible(Constructor<?> ctor) {
+        if ((!Modifier.isPublic(ctor.getModifiers()) || !Modifier.isPublic(ctor.getDeclaringClass().getModifiers()))
+                && !ctor.isAccessible()) {
+            ctor.setAccessible(true);
         }
     }
 }

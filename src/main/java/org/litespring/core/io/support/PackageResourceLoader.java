@@ -72,7 +72,7 @@ public class PackageResourceLoader {
             result[i++] = resource.getDescription().
                     replace(parentPath, "").
                     replace(".class", "")
-                    .replace(File.separatorChar, '/');
+                    .replace(File.separatorChar, '.');
         }
         return result;
     }

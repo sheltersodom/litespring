@@ -10,6 +10,7 @@ import org.litespring.beans.PropertyValue;
 import org.litespring.beans.SimpleTypeConverter;
 import org.litespring.beans.factory.BeanCreationException;
 import org.litespring.beans.factory.BeanFactoryAware;
+import org.litespring.beans.factory.InitializingBean;
 import org.litespring.beans.factory.NoSuchBeanDefinitionException;
 import org.litespring.beans.factory.config.*;
 import org.litespring.utils.ClassUtils;
@@ -29,7 +30,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class DefaultBeanFactory extends AbstractBeanFactory implements BeanDefinitionRegistry {
 
     private final Map<String, BeanDefinition> beanDefinitionMap = new ConcurrentHashMap<String, BeanDefinition>(64);
-    private static final Log logger = LogFactory.getLog(CglibProxyFactory.class);
+    private static final Log logger = LogFactory.getLog(DefaultBeanFactory.class);
 
     private List<BeanPostProcessor> beanPostProcessors = new ArrayList<>();
     private ClassLoader beanClassLoader;
@@ -83,7 +84,7 @@ public class DefaultBeanFactory extends AbstractBeanFactory implements BeanDefin
                 }
             }
         }
-        if(!bean.equals(result)){
+        if (!bean.equals(result)) {
             getAopEarlyInCreation().add(beanName);
         }
         return result;
@@ -94,6 +95,13 @@ public class DefaultBeanFactory extends AbstractBeanFactory implements BeanDefin
         Object bean = instantiateBean(bd);
         populateBean(bd, bean);
         bean = initializeBean(bd, bean);
+        return bean;
+    }
+
+    public Object createBean(Class<?> clazz) {
+        BeanDefinition bd = new GenericBeanDefinition(clazz);
+        //创建实例
+        Object bean = createBean(bd);
         return bean;
     }
 
@@ -157,6 +165,7 @@ public class DefaultBeanFactory extends AbstractBeanFactory implements BeanDefin
     protected Object initializeBean(BeanDefinition bd, Object bean) {
         invokeAwareMethods(bean);
         //TODO 对Bean进行初始化
+        invokeInitMethods(bean);
         if (!bd.isSynthetic()) {
             return applyBeanPostProcessorsAfterInitialization(bean, bd.getID());
         }
@@ -182,6 +191,11 @@ public class DefaultBeanFactory extends AbstractBeanFactory implements BeanDefin
     private void invokeAwareMethods(final Object bean) {
         if (bean instanceof BeanFactoryAware) {
             ((BeanFactoryAware) bean).setBeanFactory(this);
+        }
+    }
+    private void invokeInitMethods(final Object bean) {
+        if (bean instanceof InitializingBean) {
+            ((InitializingBean) bean).afterProperties();
         }
     }
 
@@ -256,7 +270,8 @@ public class DefaultBeanFactory extends AbstractBeanFactory implements BeanDefin
         return result;
     }
 
-    private List<String> getBeanIDsByType(Class<?> type) {
+    @Override
+    public List<String> getBeanIDsByType(Class<?> type) {
         List<String> result = new ArrayList<>();
         for (String beanName : this.beanDefinitionMap.keySet()) {
             Class<?> beanClass = null;

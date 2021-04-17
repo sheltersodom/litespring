@@ -55,7 +55,7 @@ public abstract class AbstractApplicationContext implements ApplicationContext {
             beanFactory.addBeanPostProcessor(postProcessor);
         }
         {
-            AspectJAutoProxyCreator postProcessor=new AspectJAutoProxyCreator();
+            AspectJAutoProxyCreator postProcessor = new AspectJAutoProxyCreator();
             postProcessor.setBeanFactory(beanFactory);
             beanFactory.addBeanPostProcessor(postProcessor);
         }
@@ -67,5 +67,14 @@ public abstract class AbstractApplicationContext implements ApplicationContext {
 
     public List<Object> getBeansByType(Class<?> type) {
         return this.factory.getBeansByType(type);
+    }
+
+    public Object createBean(Class<?> beanClass) {
+        return this.factory.createBean(beanClass);
+    }
+
+    @Override
+    public List<String> getBeanIDsByType(Class<?> type) {
+        return this.factory.getBeanIDsByType(type);
     }
 }
