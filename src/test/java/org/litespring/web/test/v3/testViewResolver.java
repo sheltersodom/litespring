@@ -2,6 +2,7 @@ package org.litespring.web.test.v3;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.litespring.web.servlet.DispatcherServlet;
 import org.litespring.web.servlet.View;
 import org.litespring.web.servlet.view.InternalResourceView;
 import org.litespring.web.servlet.view.InternalResourceViewResolver;
@@ -38,11 +39,6 @@ public class testViewResolver {
 
     @Test
     public void main() throws NoSuchMethodException {
-        Method method = PetStoreController.class.getDeclaredMethod("getIndex", int.class);
-        Parameter[] parameters = method.getParameters();
-        for (Parameter parameter : parameters) {
-            System.out.println(parameter.getName());
-        }
-
+        System.out.println(DispatcherServlet.class.getResource("").getPath() + "/DispatcherServlet.properties");
     }
 }

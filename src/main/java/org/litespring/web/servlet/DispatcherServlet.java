@@ -1,21 +1,14 @@
 package org.litespring.web.servlet;
 
 import org.litespring.beans.BeansException;
-import org.litespring.context.ApplicationContext;
-import org.litespring.core.io.ClassPathResource;
 import org.litespring.core.io.FileSystemResource;
 import org.litespring.ui.ModelMap;
 import org.litespring.utils.ClassUtils;
 import org.litespring.utils.StringUtils;
 import org.litespring.web.context.WebApplicationContext;
-import org.litespring.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
-import org.litespring.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
-import org.litespring.web.servlet.view.InternalResourceView;
-import org.litespring.web.servlet.view.InternalResourceViewResolver;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.beans.Beans;
 import java.io.IOException;
 import java.util.*;
 
@@ -29,7 +22,7 @@ public class DispatcherServlet extends FrameworkServlet {
     public static final String VIEW_RESOLVER_BEAN_NAME = "viewResolver";
     private static final Properties defaultStrategies;
     //TODO:处理文件位置的历史遗留问题
-    private static final String DEFAULT_STRATEGIES_PATH = "D:\\Code\\litespringmvc\\src\\main\\java\\org\\litespring\\web\\servlet\\DispatcherServlet.properties";
+    private static final String DEFAULT_STRATEGIES_PATH = DispatcherServlet.class.getResource("").getPath() + "/DispatcherServlet.properties";
 
     static {
         try {
@@ -79,56 +72,26 @@ public class DispatcherServlet extends FrameworkServlet {
         this.handlerMappings = handlerMappings;
     }
 
-//    private <T> List<T> getDefaultStrategies(WebApplicationContext context, Class<T> strategyInterface) {
-//        String key = strategyInterface.getName();
-//        String value = defaultStrategies.getProperty(key);
-//        if (value != null) {
-//            String[] classNames = StringUtils.commaDelimitedListToStringArray(value);
-//            List<T> strategies = new ArrayList<>(classNames.length);
-//            for (String className : classNames) {
-//                try {
-//                    Class<?> clazz = ClassUtils.forName(className, this.getClass().getClassLoader());
-//                    Object strategy = context.createBean(clazz);
-//                    strategies.add((T) strategy);
-//                } catch (ClassNotFoundException e) {
-//                    throw new BeansException(
-//                            "Could not find DispatcherServlet's default strategy class [" + className +
-//                                    "] for interface [" + key + "]", e);
-//                }
-//            }
-//            return strategies;
-//        }
-//        return new LinkedList<T>();
-//    }
-
-
-    /**
-     * 文件的输入处理还存在问题
-     * @param context
-     * @param strategyInterface
-     * @param <T>
-     * @return
-     */
     private <T> List<T> getDefaultStrategies(WebApplicationContext context, Class<T> strategyInterface) {
-
-        List<T> strategies = new ArrayList<>();
-
-        if (strategyInterface.isAssignableFrom(HandlerMapping.class)) {
-            Class<?> clazz = RequestMappingHandlerMapping.class;
-            Object strategy = context.createBean(clazz);
-            strategies.add((T) strategy);
-        } else if (strategyInterface.isAssignableFrom(HandlerAdapter.class)) {
-            Class<?> clazz = RequestMappingHandlerAdapter.class;
-            Object strategy = context.createBean(clazz);
-            strategies.add((T) strategy);
-        } else if (strategyInterface.isAssignableFrom(ViewResolver.class)) {
-            Class<?> clazz = InternalResourceViewResolver.class;
-            Object strategy = context.createBean(clazz);
-            strategies.add((T) strategy);
+        String key = strategyInterface.getName();
+        String value = defaultStrategies.getProperty(key);
+        if (value != null) {
+            String[] classNames = StringUtils.commaDelimitedListToStringArray(value);
+            List<T> strategies = new ArrayList<>(classNames.length);
+            for (String className : classNames) {
+                try {
+                    Class<?> clazz = this.getClass().getClassLoader().loadClass(className);
+                    Object strategy = context.createBean(clazz);
+                    strategies.add((T) strategy);
+                } catch (ClassNotFoundException e) {
+                    throw new BeansException(
+                            "Could not find DispatcherServlet's default strategy class [" + className +
+                                    "] for interface [" + key + "]", e);
+                }
+            }
+            return strategies;
         }
-
-        return strategies;
-
+        return new LinkedList<T>();
     }
 
     @Override
